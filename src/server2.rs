@@ -10,11 +10,13 @@ use std::io::Read;
 
 #[post("/", format = "multipart/form-data", data = "<content>")]
 fn webhook(config: State<config>, bridge: State<Bridge>, content: Data) {
+    println!("received web request:");
     let re = Regex::new(r"\{(.*)\}").unwrap();
     let mut dataStr = "".to_string();
     content.open().read_to_string(&mut dataStr);
     let dataStr = re.captures(&dataStr).unwrap().get(0).unwrap().as_str();
     let jsondt: Value = serde_json::from_str(dataStr).unwrap();
+    println!("Playeruuid: {}", jsondt["Player"]["uuid"]);
     matchuuids(jsondt, bridge, config);
 }
 #[post("/", format = "multipart/form-data", data = "<content>")]
